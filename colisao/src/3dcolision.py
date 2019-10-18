@@ -4,7 +4,7 @@ import numpy as np
 from sensor_msgs.msg import PointCloud
 from array import array
 from math import atan2,degrees
-from std_msgs .msg import Bool
+from std_msgs .msg import Bool, Int32
 vetx = []#Vetores de pontos
 vety = []
 vetz = []
@@ -16,12 +16,14 @@ aux_z = 0# auxiliar da variavel z para append
 j = 0 # contador de nivel
 nivel = 1 # incializa variavel nivel
 controle_nivel = 0 #controle de nivel
-cont = 0
+cont = 0# Controle do for
 angle = 0 # angulo entre pontos
 comp = [] # Vetor de comparacao entre variaveis
-ponto_z = 0
-pontos = 0
-colisao = 0
+ponto_z = 0# Pontos em Z
+pontos = 0# Filtra dados
+colisao = 0# Classifica como colisao e publica
+pontos_colisao = 0 #Variavel de teste
+
 
 def callback(data):
 	global i
@@ -35,6 +37,7 @@ def callback(data):
 	global angle
 	global pontos
 	global colisao
+	global pontos_colisao
 	#np.append(aux_x,3)
 	for i in range (0,len(data.points)):
 #	while i< len(data.points):
@@ -65,7 +68,6 @@ def callback(data):
 					if angle >= 30 and angle != 180:
 						pontos = pontos +1
 				controle_nivel = (nivel*16) -1
-				print i 
 				#Filtra se ele detecta apenas 1 ponto de colisao
 				#se houver mais de um ponto significa que a risco de colisao
 				if pontos >2:
@@ -80,6 +82,7 @@ def callback(data):
 				if i == (controle_nivel):
 					cont = 0
 					pontos = 0
+				pontos_colisao = i # Me diz os pontos do vetor
 			#Incrimento de J para controle de nivel
 			j = j+1
 			#Incremento de i para varrer os pontos
@@ -96,9 +99,11 @@ def getdata():
 	rospy.init_node("detect_colision",anonymous=True)
 	rospy.Subscriber("/velodyne_points",PointCloud,callback)
 	pub = rospy.Publisher("colisao",Bool,queue_size = 10)#Publica no topico colisao true se detectar colisao e false se nao
+	col = rospy.Publisher("Pontos",Int32,queue_size = 10)
 	rate = rospy.Rate(10)
 	while not rospy.is_shutdown():
-		pub.publish(colisao
+		pub.publish(colisao)
+		col.publish(pontos_colisao)
 	   	rate.sleep()
 if __name__== '__main__':
 	try:
