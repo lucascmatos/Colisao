@@ -65,6 +65,7 @@ def callback(data):
 					if angle >= 30 and angle != 180:
 						pontos = pontos +1
 				controle_nivel = (nivel*16) -1
+				print i 
 				#Filtra se ele detecta apenas 1 ponto de colisao
 				#se houver mais de um ponto significa que a risco de colisao
 				if pontos >2:
@@ -97,7 +98,7 @@ def getdata():
 	pub = rospy.Publisher("colisao",Bool,queue_size = 10)#Publica no topico colisao true se detectar colisao e false se nao
 	rate = rospy.Rate(10)
 	while not rospy.is_shutdown():
-		pub.publish(colisao)
+		pub.publish(colisao
 	   	rate.sleep()
 if __name__== '__main__':
 	try:
