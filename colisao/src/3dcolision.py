@@ -19,28 +19,20 @@ controle_nivel = 0 #controle de nivel
 cont = 0# Controle do for
 angle = 0 # angulo entre pontos
 comp = [] # Vetor de comparacao entre variaveis
+compz = [] # Comparacao entre Z
 ponto_z = 0# Pontos em Z
 pontos = 0# Filtra dados
 colisao = 0# Classifica como colisao e publica
 pontos_colisao = 0 #Variavel de teste
 
 
+d = 0
+check_z = 0
+
+
 def callback(data):
-	global i
-	global j
-	global vetx
-	global vety
-	global vetz
-	global cont
-	global controle_nivel
-	global nivel
-	global angle
-	global pontos
-	global colisao
-	global pontos_colisao
-	#np.append(aux_x,3)
+	global i,j,vetx,vety,vetz,cont,controle_nivel,nivel,angle,pontos,colisao,pontos_colisao,compz,comp
 	for i in range (0,len(data.points)):
-#	while i< len(data.points):
 			aux_x  = float(data.points[i].x)#Pega os valores dos pontos
 			vetx.append(aux_x)
 			aux_y = float(data.points[i].y)
@@ -59,14 +51,23 @@ def callback(data):
 				#print "Indice de colisao ", i
 				#print sum_root
 				if sum_root != 0.0 :
+					print(" X \t" + str(aux_x) + "\t Y \t" + str(aux_y) + "\t Z \t" + str(aux_z))
 					comp.append(sum_root)
 				if len(comp) == 2:
 					ponto_z =  len(vetz) - 1
-					angle  = atan2(vetz[ponto_z],(comp[1]-comp[0]))
-					comp.pop(0)
-					angle = degrees(angle)
-					if angle >= 30 and angle != 180:
+					compz.append(vetz[ponto_z])
+					if len(compz) >2:
+						angle  = atan2((compz[1]-compz[0]),(comp[1]-comp[0]))
+						#d = (comp[1]-comp[0])
+						#check_z = (compz[1]-compz[0])
+						comp.pop(0)
+						compz.pop(0)
+						angle = degrees(angle)
+						print ("\n ANGULO " + str(angle))
+					if abs(angle) >= 30 and abs(angle) != 180:
 						pontos = pontos +1
+
+						#print(" Angulo \t" + str(angle) + " distancia \t" + str(d) + " Z \t" + str(check_z))
 				controle_nivel = (nivel*16) -1
 				#Filtra se ele detecta apenas 1 ponto de colisao
 				#se houver mais de um ponto significa que a risco de colisao
@@ -82,6 +83,9 @@ def callback(data):
 				if i == (controle_nivel):
 					cont = 0
 					pontos = 0
+					comp = []
+					compz = []
+					print "\n\n\n"
 				pontos_colisao = i # Me diz os pontos do vetor
 			#Incrimento de J para controle de nivel
 			j = j+1
